@@ -1,0 +1,41 @@
+# Target profile used to build Adzuna search queries and score results.
+# Edit freely — this is what drives which jobs you get notified about.
+
+# Adzuna country code. "se" = Sweden. See https://developer.adzuna.com/docs/countries
+country: se
+
+# Where to search within that country. Leave blank ("") to search the whole country.
+where: "Stockholm"
+
+# One Adzuna search is run per line below. Keep titles close to real job-ad language.
+target_roles:
+  - "Engineering Manager"
+  - "Director of Engineering"
+  - "Head of Engineering"
+  - "VP Engineering"
+  - "Group Engineering Lead"
+  - "Developer Experience"
+  - "Platform Engineering Lead"
+  - "Technical Product Manager"
+
+# Used to score/rank results (title + description keyword match), not to search directly.
+skill_keywords:
+  - "engineering management"
+  - "developer experience"
+  - "platform engineering"
+  - "devops"
+  - "technical product management"
+  - "change management"
+  - "team leadership"
+  - "operational excellence"
+  - "software development lifecycle"
+  - "cloud"
+  - "aws"
+  - "github"
+  - "generative ai"
+
+# Max new jobs to include in a single Telegram message.
+max_results_per_run: 8
+
+# Only keep listings first seen within this many days (guards against a stale backlog).
+max_listing_age_days: 14
