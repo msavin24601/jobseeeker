@@ -4,9 +4,15 @@ Daily job-match notifications to Telegram (personal DM or a channel), based
 on a target-role profile (`config/profile.yaml`). Runs on a GitHub Actions
 schedule — no server to maintain.
 
-**Phase 1 (this repo today):** search [Adzuna](https://developer.adzuna.com/)
-for your target roles in Sweden, dedupe against what's already been sent, and
-post new matches to Telegram once a day.
+**Phase 1 (this repo today):** search [JobTech Search](https://jobtechdev.se/)
+— Arbetsformedlingen's (Sweden's public employment service) free, keyless
+job-search API — for your target roles, dedupe against what's already been
+sent, and post new matches to Telegram once a day.
+
+(Note: Adzuna was the original plan here, but it turns out Adzuna doesn't
+cover the Nordics at all — no Swedish job index behind it. JobTech Search is
+the official government source and needs no signup or API key, so it's a
+better fit anyway.)
 
 **Phase 2 (not built yet):** profile-improvement recommendations based on
 gaps between your profile and the job postings that come back. Worth
@@ -15,9 +21,9 @@ what kind of matches actually show up.
 
 ## How it works
 
-- `config/profile.yaml` — target job titles, location, and skill keywords
-  used to rank results. Edit this to change what you get notified about.
-- `src/adzuna_client.py` — queries the Adzuna search API for each target role.
+- `config/profile.yaml` — target job titles and skill keywords used to rank
+  results. Edit this to change what you get notified about.
+- `src/jobtech_client.py` — queries the JobTech Search API for each target role.
 - `src/main.py` — dedupes results across roles, scores them against your
   skill keywords, drops anything already sent (tracked in
   `data/seen_jobs.json`), and sends the top matches to Telegram.
@@ -26,12 +32,7 @@ what kind of matches actually show up.
 
 ## One-time setup
 
-### 1. Adzuna API credentials (free)
-
-1. Sign up at https://developer.adzuna.com/ and register an app.
-2. Note your `app_id` and `app_key`.
-
-### 2. Telegram bot
+### 1. Telegram bot
 
 1. Message [@BotFather](https://t.me/BotFather) on Telegram, send `/newbot`,
    and follow the prompts. Save the bot token it gives you (looks like
@@ -60,17 +61,15 @@ Then pick one:
      and look for the `"chat":{"id": ...}` value (it'll be a negative
      number like `-1001234567890`).
 
-### 3. Add GitHub repo secrets
+### 2. Add GitHub repo secrets
 
 In the repo: **Settings → Secrets and variables → Actions → New repository
 secret**. Add:
 
-- `ADZUNA_APP_ID`
-- `ADZUNA_APP_KEY`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
 
-### 4. Push this code and enable the workflow
+### 3. Push this code and enable the workflow
 
 This folder isn't yet linked to the `jobseeeker` GitHub repo. From inside it:
 
@@ -92,7 +91,7 @@ schedule.
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-export ADZUNA_APP_ID=... ADZUNA_APP_KEY=... TELEGRAM_BOT_TOKEN=... TELEGRAM_CHAT_ID=...
+export TELEGRAM_BOT_TOKEN=... TELEGRAM_CHAT_ID=...
 python src/main.py
 ```
 
@@ -100,9 +99,10 @@ python src/main.py
 
 Edit `config/profile.yaml`:
 
-- `target_roles` — one Adzuna search per entry; keep phrasing close to how
-  job ads are actually titled.
-- `where` — leave `""` to search all of Sweden instead of just Stockholm.
+- `target_roles` — one search per entry; keep phrasing close to how job ads
+  are actually titled. Results aren't restricted by location (JobTech Search
+  only covers Sweden anyway) — each hit's municipality is shown in the
+  Telegram message so you can judge fit.
 - `skill_keywords` — used only for ranking (not searching); jobs mentioning
   more of these sort higher.
 - `max_results_per_run` — cap on how many new jobs land in one message.
