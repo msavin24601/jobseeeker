@@ -2,18 +2,45 @@
 # and score results. Edit freely — this is what drives which jobs you get
 # notified about. Source only covers the Swedish job market.
 
-# One search is run per line below. Keep titles close to real job-ad language.
+# Free-text searches. Keep titles close to real job-ad language. Results are
+# filtered to headlines containing a word from title_include_keywords below,
+# since free-text search on this API pulls in generic IC postings otherwise.
 target_roles:
   - "Engineering Manager"
   - "Director of Engineering"
   - "Head of Engineering"
   - "VP Engineering"
   - "Group Engineering Lead"
-  - "Developer Experience"
-  - "Platform Engineering Lead"
+  - "Head of Product"
+  - "Product Manager"
+  - "Senior Product Manager"
   - "Technical Product Manager"
+  - "Product Owner"
 
-# Used to score/rank results (title + description keyword match), not to search directly.
+# Structured occupation-group queries (Swedish public taxonomy — SSYK-based).
+# These are trustworthy management-level categories, so results from these are
+# NOT run through the title_include_keywords filter below.
+# Full taxonomy: https://jobsearch.api.jobtechdev.se/search?occupation-field=<id>&stats=occupation-group
+occupation_groups:
+  - name: "IT-chefer (IT managers)"
+    concept_id: "eWiB_mGP_MjE"
+  - name: "Forsknings- och utvecklingschefer (R&D managers)"
+    concept_id: "QG4f_MCh_vND"
+
+# A free-text result's headline must contain at least one of these
+# (case-insensitive) to survive — this is what filters out plain
+# "Software Engineer" / "Developer" postings that the text search pulls in.
+title_include_keywords:
+  - "manager"
+  - "director"
+  - "head of"
+  - "vp "
+  - "chef"
+  - "lead"
+  - "product owner"
+  - "principal"
+
+# Used to score/rank surviving results (title + description keyword match).
 skill_keywords:
   - "engineering management"
   - "developer experience"

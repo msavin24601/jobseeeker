@@ -9,10 +9,19 @@ SEARCH_URL = "https://jobsearch.api.jobtechdev.se/search"
 
 
 def search_jobs(role: str, limit: int = 20) -> list[dict]:
-    """Search for a role. Returns normalized job dicts."""
+    """Free-text search for a role. Returns normalized job dicts."""
+    return _search({"q": role, "limit": limit, "sort": "pubdate-desc"})
+
+
+def search_by_occupation_group(concept_id: str, limit: int = 20) -> list[dict]:
+    """Search within a Swedish taxonomy occupation-group (e.g. IT managers)."""
+    return _search({"occupation-group": concept_id, "limit": limit, "sort": "pubdate-desc"})
+
+
+def _search(params: dict) -> list[dict]:
     response = requests.get(
         SEARCH_URL,
-        params={"q": role, "limit": limit, "sort": "pubdate-desc"},
+        params=params,
         headers={"accept": "application/json"},
         timeout=30,
     )

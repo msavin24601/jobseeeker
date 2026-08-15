@@ -99,10 +99,22 @@ python src/main.py
 
 Edit `config/profile.yaml`:
 
-- `target_roles` — one search per entry; keep phrasing close to how job ads
-  are actually titled. Results aren't restricted by location (JobTech Search
-  only covers Sweden anyway) — each hit's municipality is shown in the
-  Telegram message so you can judge fit.
+- `target_roles` — free-text searches, one per entry; keep phrasing close to
+  how job ads are actually titled. JobTech Search's free-text matching pulls
+  in generic postings (e.g. plain "Software Engineer" for an "Engineering
+  Manager" search), so results are filtered through `title_include_keywords`
+  before scoring.
+- `title_include_keywords` — a free-text result's headline must contain one
+  of these (case-insensitive) to survive. This is the main lever if you're
+  getting too much/little noise from `target_roles`.
+- `occupation_groups` — structured queries against the Swedish public
+  taxonomy's occupation categories (SSYK-based). These bypass the title
+  filter since the category itself already guarantees management level. Find
+  more category IDs via `.../search?occupation-field=<id>&stats=occupation-group`
+  — see the concept_id values in the current list for the URL pattern.
+- Results aren't restricted by location (JobTech Search only covers Sweden
+  anyway) — each hit's municipality is shown in the Telegram message so you
+  can judge fit.
 - `skill_keywords` — used only for ranking (not searching); jobs mentioning
   more of these sort higher.
 - `max_results_per_run` — cap on how many new jobs land in one message.

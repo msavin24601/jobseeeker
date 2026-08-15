@@ -11,7 +11,7 @@ from pathlib import Path
 import requests
 import yaml
 
-from jobtech_client import search_jobs
+from jobtech_client import search_by_occupation_group, search_jobs
 from storage import load_seen, save_seen
 from telegram_notify import TelegramError, send_message
 
@@ -43,9 +43,15 @@ def is_recent(job: dict, max_days_old: int) -> bool:
     return datetime.now(timezone.utc) - published_at <= timedelta(days=max_days_old)
 
 
+def title_matches(job: dict, include_keywords: list[str]) -> bool:
+    title = job.get("title", "").lower()
+    return any(kw.lower() in title for kw in include_keywords)
+
+
 def collect_candidate_jobs(cfg: dict) -> dict[str, dict]:
-    """Search every target role and dedupe by job id."""
+    """Search every target role and occupation group, dedupe by job id."""
     by_id: dict[str, dict] = {}
+
     for role in cfg["target_roles"]:
         try:
             results = search_jobs(role=role)
@@ -53,8 +59,19 @@ def collect_candidate_jobs(cfg: dict) -> dict[str, dict]:
             print(f"Skipping role '{role}': {e}", file=sys.stderr)
             continue
         for job in results:
+            if title_matches(job, cfg["title_include_keywords"]) and is_recent(job, cfg["max_listing_age_days"]):
+                by_id[job["id"]] = job
+
+    for group in cfg.get("occupation_groups", []):
+        try:
+            results = search_by_occupation_group(concept_id=group["concept_id"])
+        except requests.RequestException as e:
+            print(f"Skipping occupation group '{group['name']}': {e}", file=sys.stderr)
+            continue
+        for job in results:
             if is_recent(job, cfg["max_listing_age_days"]):
                 by_id[job["id"]] = job
+
     return by_id
 
 
