@@ -5,12 +5,23 @@
 # Free-text searches. Keep titles close to real job-ad language. Results are
 # filtered to headlines containing a word from title_include_keywords below,
 # since free-text search on this API pulls in generic IC postings otherwise.
+# Four focus areas: engineering management, project management, program
+# management, product management.
 target_roles:
+  # Engineering management
   - "Engineering Manager"
   - "Director of Engineering"
   - "Head of Engineering"
   - "VP Engineering"
   - "Group Engineering Lead"
+  # Project management
+  - "Project Manager"
+  - "Senior Project Manager"
+  - "IT Project Manager"
+  # Program management
+  - "Program Manager"
+  - "Technical Program Manager"
+  # Product management
   - "Head of Product"
   - "Product Manager"
   - "Senior Product Manager"
@@ -43,10 +54,12 @@ title_include_keywords:
 # Used to score/rank surviving results (title + description keyword match).
 skill_keywords:
   - "engineering management"
+  - "project management"
+  - "program management"
+  - "technical product management"
   - "developer experience"
   - "platform engineering"
   - "devops"
-  - "technical product management"
   - "change management"
   - "team leadership"
   - "operational excellence"
